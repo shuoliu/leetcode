@@ -1,4 +1,0 @@
-leetcode
-========
-
-oj.leetcode.com
