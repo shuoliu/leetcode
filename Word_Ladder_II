@@ -1,0 +1,80 @@
+public class Solution {
+    
+	private ArrayList<ArrayList<String>> retval = new ArrayList<ArrayList<String>>();
+	
+	private boolean diffOne(String now, String next) {
+        int diff = 0;
+        int i = 0;
+        while(i < now.length()) {
+            if(now.charAt(i) != next.charAt(i)) {
+                diff ++;
+            }
+            i ++;
+        }
+        if(diff != 1) {
+            return false;
+        }
+        return true;
+    }
+    
+    
+    private void addNewLadder(ArrayList<ArrayList<String>> ladders, ArrayList<String> ladder, String step, HashSet<String> used) {
+        ArrayList<String> newladder = (ArrayList<String>) ladder.clone();
+        newladder.add(step);
+        ladders.add(newladder);
+        if(!used.contains(step)) {
+            used.add(step);
+        }
+    }
+    
+    private void oneStepFurther(ArrayList<String> ladder, ArrayList<ArrayList<String>> templists, HashSet<String> tempused, HashSet<String> used, String end, HashSet<String> dict) {
+        String last = ladder.get(ladder.size() - 1);
+        if(diffOne(last, end)) {
+            addNewLadder(retval, ladder, end, tempused);
+            return;
+        }
+        for(String key : dict) {
+            if(used.contains(key)) {
+                continue;
+            }
+            if(diffOne(last, key)) {
+                addNewLadder(templists, ladder, key, tempused);
+            }
+        }
+    }
+    
+    public ArrayList<ArrayList<String>> findLadders(String start, String end, HashSet<String> dict) {
+        // IMPORTANT: Please reset any member data you declared, as
+        // the same Solution instance will be reused for each test case.
+    	int dictsize = dict.size();
+        ArrayList<ArrayList<String>> ret = new ArrayList<ArrayList<String>>();
+        ArrayList<String> first = new ArrayList<String>(dictsize);
+        first.add(start);
+        ret.add(first);
+        HashSet<String> used = new HashSet<String>(dictsize);
+        if(dict.contains(start)) {
+            used.add(start);
+        }
+        HashSet<String> tempused = new HashSet<String>(dictsize);
+        ArrayList<ArrayList<String>> templists = new ArrayList<ArrayList<String>>();
+        while(true) {
+            Iterator<ArrayList<String>> itladders = ret.iterator();
+            while(itladders.hasNext()) {
+                ArrayList<String> ladder = itladders.next();
+                oneStepFurther(ladder, templists, tempused, used, end, dict);
+            }
+            ret.clear();
+            ArrayList<ArrayList<String>> x = ret;
+            ret = templists;
+            templists = x;
+            if(tempused.contains(end) || tempused.size() == 0) {
+                break;
+            }
+            for(String s : tempused) {
+                used.add(s);
+            }
+            tempused.clear();
+        }
+        return retval;
+    }
+}
